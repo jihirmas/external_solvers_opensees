@@ -58,12 +58,13 @@ def makeXObjectMetaData():
 
     return xom
 
-def getNodalSpatialDim(xobj, xobj_phys_prop):
-    return [(3,3) for i in range(10)]#(ndm, ndf)
 
-# TODO: ver cual nos quedamos o si cambiamos nombre
-# def getNodalSpatialDim(xobj, xobj_phys_prop):
-# 	return [(3,1) for i in range(10)]#(ndm, ndf)
+def getNodalSpatialDimExtended(xobj, xobj_phys_prop):
+    return [(3,1) for i in range(10)]
+
+def getNodalSpatialDim(xobj, xobj_phys_prop):
+    return [(3,3) for i in range(10)]
+
 
 def writeTcl(pinfo):
     

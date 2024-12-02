@@ -164,6 +164,11 @@ def __map_domain_nodes(pinfo, domain, elem_prop, phys_prop):
 		raise Exception('null XObject in element property object')
 	elem_module_name = 'opensees.element_properties.{}.{}'.format(xobj.Xnamespace, xobj.name)
 	elem_module = importlib.import_module(elem_module_name)
+	spatial_dim = None
+	if hasattr(elem_module, 'getNodalSpatialDimExtended') and pinfo.is_thermo_mechanical_analysis:
+		spatial_dim = elem_module.getNodalSpatialDimExtended
+	elif hasattr(elem_module, 'getNodalSpatialDim'):
+		spatial_dim = elem_module.getNodalSpatialDim
 	if not hasattr(elem_module, 'getNodalSpatialDim'):
 		return
 	
@@ -172,7 +177,7 @@ def __map_domain_nodes(pinfo, domain, elem_prop, phys_prop):
 		xobj_pp = phys_prop.XObject
 	
 	# get nodal dims for each node in element. make the dofs in dim a list
-	node_dims = elem_module.getNodalSpatialDim(xobj, xobj_pp)
+	node_dims = spatial_dim(xobj, xobj_pp)
 	for elem in domain.elements:
 		elem_node_dim = []
 		elem_node_id = []

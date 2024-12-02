@@ -213,14 +213,16 @@ class process_info:
 		is thermo mechanical analysis
   		'''
 		self.is_thermo_mechanical_analysis = False
+		'''
+		region data
+		'''
+		self.regions_data = {}
   
 	def remove_node_from_loaded_subset(self, node_id):
-		if self.node_subset is not None:
-			self.loaded_node_subset.discard(node_id)
+		self.loaded_node_subset.remove(node_id)
 	
 	def remove_element_from_loaded_subset(self, element_id):
-		if self.element_subset is not None:
-			self.loaded_element_subset.discard(element_id)
+		self.loaded_element_subset.remove(element_id)
   
 	
 		
