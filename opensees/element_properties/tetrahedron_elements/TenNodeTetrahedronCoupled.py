@@ -58,12 +58,12 @@ def makeXObjectMetaData():
 
     return xom
 
-# def getNodalSpatialDim(xobj, xobj_phys_prop):
-#     return [(3,3) for i in range(10)]#(ndm, ndf)
+def getNodalSpatialDim(xobj, xobj_phys_prop):
+    return [(3,3) for i in range(10)]#(ndm, ndf)
 
 # TODO: ver cual nos quedamos o si cambiamos nombre
-def getNodalSpatialDim(xobj, xobj_phys_prop):
-	return [(3,1) for i in range(10)]#(ndm, ndf)
+# def getNodalSpatialDim(xobj, xobj_phys_prop):
+# 	return [(3,1) for i in range(10)]#(ndm, ndf)
 
 def writeTcl(pinfo):
     
@@ -125,11 +125,10 @@ def writeTcl(pinfo):
         sopt = '{} {} {}'.format(b1, b2, b3)
     sopt_thermal = sopt = '{} {} {} {} {} {}'.format(kxx, kyy, kzz, rho, cp, Q)  
     # command
-    full_string = "if {$STKO_VAR_thermal_anaylsis} {\n"
-    full_string += '\t{}element TenNodeTetrahedronThermal {} {} {}\n'.format(pinfo.indent, tag, nstr, sopt_thermal)
-    full_string += "} else {\n"
-    full_string += '\t{}element TenNodeTetrahedron {} {} {} {}\n'.format(pinfo.indent, tag, nstr, matTag, sopt)
-    full_string += "}\n"    
+    if pinfo.is_thermo_mechanical_analysis:
+        full_string = 'element TenNodeTetrahedronThermal {} {} {}\n'.format(tag, nstr, sopt_thermal)
+    else:
+        full_string = 'element TenNodeTetrahedron {} {} {} {}\n'.format(tag, nstr, matTag, sopt)
 
     # now write the string into the file
     pinfo.out_file.write(full_string)

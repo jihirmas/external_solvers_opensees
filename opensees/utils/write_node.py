@@ -36,7 +36,7 @@ def fill_node_mass_map(doc, pinfo):
 			pinfo.condition = item
 			module.fillNodeMassMap(pinfo)
 
-def __postprocess_domain_collection_nodes(pinfo, is_thermo_mechanical_analysis):
+def __postprocess_domain_collection_nodes(pinfo):
 
 	# block durations for progress monitoring
 	# this method is called by anothe one, its duration is 50% of the calling
@@ -81,7 +81,7 @@ def __postprocess_domain_collection_nodes(pinfo, is_thermo_mechanical_analysis):
 						continue
 					int_dof = __intersection(prev_dof, dof)
 					l_nd = len(int_dof)
-					if l_nd == 0 and not is_thermo_mechanical_analysis:
+					if l_nd == 0 and not pinfo.is_thermo_mechanical_analysis:
 						raise Exception('Error: Different NDF on same node (node = {}, NDF1 = {}, NDF2 = {})'.format(node, dof, prev_dof))
 					else:
 						pinfo.node_to_model_map[node] = (dim[0], int_dof)
@@ -139,7 +139,7 @@ def __postprocess_domain_collection_nodes(pinfo, is_thermo_mechanical_analysis):
 	for node_id, dim in pinfo.node_to_model_map.items():
 		ndf = dim[1]
 		if isinstance(ndf, list):
-			if is_thermo_mechanical_analysis:
+			if pinfo.is_thermo_mechanical_analysis:
 				dim = (3,1)
 			else:
 				dim = (dim[0], ndf[0])
@@ -212,7 +212,7 @@ def __map_domain_collection_nodes(pinfo, domain_collection, elem_prop_asn_on, ph
 		phys_prop = phys_prop_asn_on[domain_id]
 		__map_domain_nodes(pinfo, domain, elem_prop, phys_prop)
 
-def node_map_ndm_ndf (doc, pinfo, is_thermo_mechanical_analysis = False):
+def node_map_ndm_ndf (doc, pinfo):
 
 	# block durations
 	duration_mapping = 0.45
@@ -277,7 +277,7 @@ def node_map_ndm_ndf (doc, pinfo, is_thermo_mechanical_analysis = False):
 
 	# post process mapped nodes/dims
 	# (about 50% of the work)
-	__postprocess_domain_collection_nodes(pinfo, is_thermo_mechanical_analysis)
+	__postprocess_domain_collection_nodes(pinfo)
 	current_percentage += duration_post
 	PyMpc.App.monitor().sendPercentage(current_percentage)
 

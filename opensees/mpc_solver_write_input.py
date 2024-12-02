@@ -149,7 +149,6 @@ def write_tcl_int(out_dir):
 	main_file.write('{}}}\n'.format(pinfo.indent))
  
 	#for thermal analysis 
-	is_thermo_mechanical_analysis = False
 	for astep_id, astep in doc.analysisSteps.items():
 		xobj = astep.XObject
 		if (xobj is not None) and (xobj.name == 'StartThermoMechanicalAnalysis'):
@@ -169,7 +168,7 @@ def write_tcl_int(out_dir):
 	pinfo.inv_map = {}
 	PyMpc.App.monitor().sendMessage('creating NDM/NDF pairs for each node...')
 	PyMpc.App.monitor().setRange(current_percentage, current_percentage + duration_mapping)
-	write_node.node_map_ndm_ndf(doc, pinfo, is_thermo_mechanical_analysis)
+	write_node.node_map_ndm_ndf(doc, pinfo)
 	write_node.lagrangian_node(doc, pinfo)
 	write_node.short_map(doc, pinfo)
 	if pinfo.inv_map:

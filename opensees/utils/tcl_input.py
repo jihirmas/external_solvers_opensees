@@ -213,6 +213,16 @@ class process_info:
 		is thermo mechanical analysis
   		'''
 		self.is_thermo_mechanical_analysis = False
+  
+	def remove_node_from_loaded_subset(self, node_id):
+		if self.node_subset is not None:
+			self.loaded_node_subset.discard(node_id)
+	
+	def remove_element_from_loaded_subset(self, element_id):
+		if self.element_subset is not None:
+			self.loaded_element_subset.discard(element_id)
+  
+	
 		
 	def setProcessCount(self, pc):
 		'''
@@ -246,6 +256,8 @@ class process_info:
 		'''
 		update model builder, needed for some elements/materials
 		'''
+		if self.is_thermo_mechanical_analysis:
+			_ndf = 1
 		if _ndf == 32:
 			_ndf = 2
 		if _ndf == 33:
