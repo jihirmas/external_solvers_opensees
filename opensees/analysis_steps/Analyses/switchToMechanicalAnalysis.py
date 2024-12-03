@@ -50,17 +50,13 @@ def writeTcl(pinfo):
 	pinfo.out_file.write('\n{}# Remove thermal elements\n'.format(pinfo.indent))
 	pinfo.out_file.write('{}foreach ele_id ${} {{ remove element $ele_id }}\n'.format(pinfo.indent, region_name))
 	
-	print(pinfo.inv_map)
-	valor_anterior = pinfo.inv_map[(3,1)]
-	pinfo.inv_map[(3,3)] = valor_anterior
- 
-	pinfo.ndm = 3
-	pinfo.ndf = 3
+	pinfo.inv_map[(3,3)] = pinfo.inv_map.pop((3,1))
+
 	pinfo.is_thermo_mechanical_analysis = False
 	
  
-	del pinfo.inv_map[(3,1)]
-	print(pinfo.node_to_model_map)
-	
+	# print(pinfo.node_to_model_map)
+	for item in pinfo.node_to_model_map:
+		pinfo.node_to_model_map[item] = (3,3)
 	
 	pinfo.out_file.write('\n')
