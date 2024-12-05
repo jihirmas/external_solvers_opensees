@@ -6,37 +6,50 @@ import opensees.utils.tcl_input as tclin
 def makeXObjectMetaData():
 	
     # E
-    at_E = MpcAttributeMetaData()
-    at_E.type = MpcAttributeType.QuantityScalar
-    at_E.name = 'E'
-    at_E.group = 'Elasticity'
-    at_E.description = (
+    at_list_of_E_values = MpcAttributeMetaData()
+    at_list_of_E_values.type = MpcAttributeType.QuantityVector
+    at_list_of_E_values.name = 'list_of_E_values'
+    at_list_of_E_values.group = 'Time Varying Values'
+    at_list_of_E_values.description = (
         html_par(html_begin()) +
-        html_par(html_boldtext('E')+'<br/>') + 
-        html_par('elastic Modulus') +
+        html_par(html_boldtext('list_of_E_values')+'<br/>') + 
+        html_par('E values') +
         html_par(html_href('http://opensees.berkeley.edu/wiki/index.php/Elastic_Isotropic_Material','Elastic Isotropic Material')+'<br/>') +
         html_end()
         )
-    at_E.dimension = u.F/u.L**2
 
     # v
-    at_v = MpcAttributeMetaData()
-    at_v.type = MpcAttributeType.Real
-    at_v.name = 'v'
-    at_v.group = 'Elasticity'
-    at_v.description = (
+    at_list_of_v_values = MpcAttributeMetaData()
+    at_list_of_v_values.type = MpcAttributeType.QuantityVector
+    at_list_of_v_values.name = 'list_of_v_values'
+    at_list_of_v_values.group = 'Time Varying Values'
+    at_list_of_v_values.description = (
         html_par(html_begin()) +
-        html_par(html_boldtext('v')+'<br/>') + 
-        html_par('Poisson\'s ratio') +
+        html_par(html_boldtext('list_of_v_values')+'<br/>') + 
+        html_par('v values') +
         html_par(html_href('http://opensees.berkeley.edu/wiki/index.php/Elastic_Isotropic_Material','Elastic Isotropic Material')+'<br/>') +
         html_end()
         )
+    
+    # A
+    at_list_of_A_values = MpcAttributeMetaData()
+    at_list_of_A_values.type = MpcAttributeType.QuantityVector
+    at_list_of_A_values.name = 'list_of_A_values'
+    at_list_of_A_values.group = 'Time Varying Values'
+    at_list_of_A_values.description = (
+        html_par(html_begin()) +
+        html_par(html_boldtext('list_of_A_values')+'<br/>') + 
+        html_par('A values') +
+        html_par(html_href('http://opensees.berkeley.edu/wiki/index.php/Elastic_Isotropic_Material','Elastic Isotropic Material')+'<br/>') +
+        html_end()
+        )
+    
 
     # time_intervals (ti)
     at_ti = MpcAttributeMetaData()
     at_ti.type = MpcAttributeType.Real
     at_ti.name = 'ti'
-    at_ti.group = 'Elasticity'
+    at_ti.group = 'Time Varying Values'
     at_ti.description = (
         html_par(html_begin()) +
         html_par(html_boldtext('ti')+'<br/>') + 
@@ -49,7 +62,7 @@ def makeXObjectMetaData():
     at_it = MpcAttributeMetaData()
     at_it.type = MpcAttributeType.Real
     at_it.name = 'it'
-    at_it.group = 'Elasticity'
+    at_it.group = 'Time Varying Values'
     at_it.description = (
         html_par(html_begin()) +
         html_par(html_boldtext('it')+'<br/>') + 
@@ -62,7 +75,7 @@ def makeXObjectMetaData():
     at_ft = MpcAttributeMetaData()
     at_ft.type = MpcAttributeType.Real
     at_ft.name = 'ft'
-    at_ft.group = 'Elasticity'
+    at_ft.group = 'Time Varying Values'
     at_ft.description = (
         html_par(html_begin()) +
         html_par(html_boldtext('ft')+'<br/>') + 
@@ -75,8 +88,9 @@ def makeXObjectMetaData():
     xom = MpcXObjectMetaData()
     xom.name = 'TimeVarying'
     xom.Xgroup = 'Other nD Materials'
-    xom.addAttribute(at_E)
-    xom.addAttribute(at_v)
+    xom.addAttribute(at_list_of_E_values)
+    xom.addAttribute(at_list_of_v_values)
+    xom.addAttribute(at_list_of_A_values)
     xom.addAttribute(at_ti)
     xom.addAttribute(at_it)
     xom.addAttribute(at_ft)
@@ -91,16 +105,21 @@ def writeTcl(pinfo):
     tag = xobj.parent.componentId
 
     # mandatory parameters
-    E_at = xobj.getAttribute('E')
-    if(E_at is None):
-        raise Exception('Error: cannot find "E" attribute')
-    E = E_at.quantityScalar
+    list_of_E_values_at = xobj.getAttribute('list_of_E_values')
+    if(list_of_E_values_at is None):
+        raise Exception('Error: cannot find "list_of_E_values" attribute')
+    listValueE = list_of_E_values_at.quantityVector
 
-    v_at = xobj.getAttribute('v')
-    if(v_at is None):
-        raise Exception('Error: cannot find "v" attribute')
-    v = v_at.real
+    list_of_v_values_at = xobj.getAttribute('list_of_v_values')
+    if(list_of_v_values_at is None):
+        raise Exception('Error: cannot find "list_of_v_values" attribute')
+    listValuev = list_of_v_values_at.quantityVector
 
+    list_of_A_values_at = xobj.getAttribute('list_of_A_values')
+    if(list_of_A_values_at is None):
+        raise Exception('Error: cannot find "list_of_A_values" attribute')
+    listValueA = list_of_A_values_at.quantityVector
+    
     ti_at = xobj.getAttribute('ti')
     if(ti_at is None):
         raise Exception('Error: cannot find "ti" attribute')
@@ -115,11 +134,11 @@ def writeTcl(pinfo):
     if(ft_at is None):
         raise Exception('Error: cannot find "ft" attribute')
     ft = ft_at.real
-
+    
     # optional paramters
     sopt = ''
     material_selected = '1'
-    str_tcl = f'{pinfo.indent}nDMaterial TimeVarying {tag} 1 {int(ti)} {it} {ft} ' + ' '.join([f'{E.value}'] * int(ti)) + ' ' + ' '.join([f'{v}'] * int(ti)) + ' ' + ' '.join(['1'] * int(ti)) + f' {sopt}\n'
+    str_tcl = f'{pinfo.indent}nDMaterial TimeVarying {tag} {material_selected} {int(ti)} {it} {ft} ' + ' '.join([f'{listValueE.valueAt(i)}' for i in range(int(ti))]) + ' ' + ' '.join([f'{listValuev.valueAt(i)}' for i in range(int(ti))]) + ' ' + ' '.join([f'{listValueA.valueAt(i)}' for i in range(int(ti))]) + f' {sopt}\n'
     
     # now write the string into the file
     pinfo.out_file.write(str_tcl)
