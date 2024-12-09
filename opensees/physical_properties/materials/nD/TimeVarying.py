@@ -68,27 +68,15 @@ def makeXObjectMetaData():
         html_end()
         )
 
-    # initial_time (it)
-    at_it = MpcAttributeMetaData()
-    at_it.type = MpcAttributeType.Real
-    at_it.name = 'it'
-    at_it.group = 'Time Varying Values'
-    at_it.description = (
+    # time values
+    at_list_of_time_values = MpcAttributeMetaData()
+    at_list_of_time_values.type = MpcAttributeType.QuantityVector
+    at_list_of_time_values.name = 'list_of_time_values'
+    at_list_of_time_values.group = 'Time Varying Values'
+    at_list_of_time_values.description = (
         html_par(html_begin()) +
-        html_par(html_boldtext('it')+'<br/>') + 
-        html_par('Initial Time') +
-        html_end()
-        )
-
-    # final_time (ft)
-    at_ft = MpcAttributeMetaData()
-    at_ft.type = MpcAttributeType.Real
-    at_ft.name = 'ft'
-    at_ft.group = 'Time Varying Values'
-    at_ft.description = (
-        html_par(html_begin()) +
-        html_par(html_boldtext('ft')+'<br/>') + 
-        html_par('Final Time') +
+        html_par(html_boldtext('list_of_time_values')+'<br/>') + 
+        html_par('time values') +
         html_end()
         )
 
@@ -100,8 +88,7 @@ def makeXObjectMetaData():
     xom.addAttribute(at_list_of_v_values)
     xom.addAttribute(at_list_of_A_values)
     xom.addAttribute(at_ti)
-    xom.addAttribute(at_it)
-    xom.addAttribute(at_ft)
+    xom.addAttribute(at_list_of_time_values)
     xom.addAttribute(at_material)
 
 	
@@ -140,15 +127,10 @@ def writeTcl(pinfo):
         raise Exception('Error: cannot find "ti" attribute')
     ti = ti_at.real
 
-    it_at = xobj.getAttribute('it')
-    if(it_at is None):
-        raise Exception('Error: cannot find "it" attribute')
-    it = it_at.real
-    
-    ft_at = xobj.getAttribute('ft')
-    if(ft_at is None):
-        raise Exception('Error: cannot find "ft" attribute')
-    ft = ft_at.real
+    list_of_time_values_at = xobj.getAttribute('list_of_time_values')
+    if(list_of_time_values_at is None):
+        raise Exception('Error: cannot find "list_of_time_values" attribute')
+    listValuetime = list_of_time_values_at.quantityVector
     
     checkLength(listValueE, ti, 'list_of_E_values')
     checkLength(listValuev, ti, 'list_of_v_values')
@@ -157,7 +139,7 @@ def writeTcl(pinfo):
     # optional paramters
     sopt = ''
     material_selected = material.index
-    str_tcl = f'{pinfo.indent}nDMaterial TimeVarying {tag} {material_selected} {int(ti)} {it} {ft} ' + ' '.join([f'{listValueE.valueAt(i)}' for i in range(int(ti))]) + ' ' + ' '.join([f'{listValuev.valueAt(i)}' for i in range(int(ti))]) + ' ' + ' '.join([f'{listValueA.valueAt(i)}' for i in range(int(ti))]) + f' {sopt}\n'
+    str_tcl = f'{pinfo.indent}nDMaterial TimeVarying {tag} {material_selected} {int(ti)} ' + ' '.join([f'{listValuetime.valueAt(i)}' for i in range(int(ti))]) + ' ' + ' '.join([f'{listValueE.valueAt(i)}' for i in range(int(ti))]) + ' ' + ' '.join([f'{listValuev.valueAt(i)}' for i in range(int(ti))]) + ' ' + ' '.join([f'{listValueA.valueAt(i)}' for i in range(int(ti))]) + f' {sopt}\n'
     
     # now write the string into the file
     pinfo.out_file.write(str_tcl)
